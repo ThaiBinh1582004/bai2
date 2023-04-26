@@ -229,9 +229,35 @@ void inDSbaihat(List l)
 	int i = 0;
 	for (Node *k = l.head; k != NULL; k = k->next)
 	{
-		printf("\n--- Bai hat thu %d --- ", (++i));
+		printf("\n\n--- Bai hat thu %d --- ", (++i));
 		inBaihat(k);
 	}
+}
+
+int tinhThoigian_nghehet(List l)
+{
+	int tong = 0;
+	for (Node *k = l.head; k != NULL; k = k->next)
+	{
+		tong = tong + k->data.thoiluong;
+	}
+
+	return tong;
+}
+
+int xoaBaihat(List &l, char ten[])
+{
+	int ktra = 0;
+	for (Node *k = l.head; k != NULL; k = k->next)
+	{
+		if (strcmp(ten, (k->next)->data.ten) == 0)
+		{
+			ktra = 1;
+			xoaSau(l, k);
+		}
+	}
+
+	return ktra;
 }
 
 void MENU(List &l)
@@ -240,11 +266,12 @@ void MENU(List &l)
 	{
 		system("cls");
 		printf("\n--------------------- MENU ---------------------");
-		printf("\n\t11. Doc danh sach tu File");
-		printf("\n\t12. Ghi danh sach vao File");
+		printf("\n\t1. Doc danh sach tu File");
+		//printf("\n\t12. Ghi danh sach vao File");
 		printf("\n\t2.  In danh sach bai bai");
 		printf("\n\t3.  Thoi luong xem het tat ca bai hat");
 		printf("\n\t4.  Them bai hat vao cuoi danh sach");
+		printf("\n\t5.  Xoa bai hat trong ds");
 		printf("\n\t0.  Thoat!");
 		printf("\n--------------------- END ---------------------");
 
@@ -254,14 +281,9 @@ void MENU(List &l)
 
 		switch (lc)
 		{
-		case 11:
+		case 1:
 		{
 				   docFile(l);
-				   break;
-		}
-		case 12:
-		{
-				   ghiFile(l);
 				   break;
 		}
 		case 2:
@@ -270,11 +292,31 @@ void MENU(List &l)
 				  _getch();
 				  break;
 		}
+		case 3:
+		{
+				  printf("\nTong thoi gian de nghe het playlist la: %d", tinhThoigian_nghehet(l));
+				  _getch();
+				  break;
+		}
 		case 4:
 		{
 				  Baihat thongtin = Nhap_Baihat();
 				  Node *tmp = createNode(thongtin);
 				  themvaoCuoi(l, tmp);
+				  ghiFile(l);
+				  break;
+		}
+		case 5:
+		{
+				  char ten[50];
+				  printf("\nNhap ten bai ban muon xoa: ");
+				  scanf("%s", ten);
+				  int ktra = xoaBaihat(l, ten);
+				  if (ktra == 0)
+					  printf("\nThuc hien khong thanh cong!" 
+					  "\n(Co the trong ds khong co bai hat voi ten: %s)", ten);
+				  _getch();
+				  ghiFile(l);
 				  break;
 		}
 		case 0:	return;
