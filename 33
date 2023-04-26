@@ -220,7 +220,7 @@ void inBaihat(Node *p)
 {
 	printf("\nTen bai hat:  %s", p->data.ten);
 	printf("\nTen tac gia:  %s", p->data.tacgia);
-	printf("\nTen ca si:  %d", p->data.casi);
+	printf("\nTen ca si:  %s", p->data.casi);
 	printf("\nThoi luong:  %d", p->data.thoiluong);
 }
 
@@ -245,20 +245,48 @@ int tinhThoigian_nghehet(List l)
 	return tong;
 }
 
-int xoaBaihat(List &l, Baihat x)
-{
-	int ktra = 0;
-	for (Node *k = l.head; k != NULL; k = k->next)
-	{
-		Node *h = k->next;
-		if (strcmp(x.ten, h->data.ten) == 0 && h!= NULL)
-		{
-			ktra = 1;
-			xoaSau(l, k);
-		}
-	}
+// int xoaBaihat(List &l, Baihat x)
+// {
+// 	int ktra = 0;
+// 	for (Node *k = l.head; k != NULL; k = k->next)
+// 	{
+// 		Node *h = k->next;
+// 		if (strcmp(x.ten, h->data.ten) == 0 && h!= NULL)
+// 		{
+// 			ktra = 1;
+// 			xoaSau(l, k);
+// 		}
+// 	}
 
-	return ktra;
+// 	return ktra;
+// }
+
+int xoaBaihat(List& l, Baihat x)
+{
+    if (l.head == NULL)
+        return 0;
+
+    if (strcmp(x.ten, l.head->data.ten) == 0)
+    {
+        xoaDau(l);
+        return 1;
+    }
+
+    Node* k = l.head;
+    Node* h = k->next;
+
+    while (h != NULL)
+    {
+        if (strcmp(x.ten, h->data.ten) == 0)
+        {
+            xoaSau(l, k);
+            return 1;
+        }
+        k = h;
+        h = h->next;
+    }
+
+    return 0;
 }
 
 int ktraBaihat(List l, Baihat x)
@@ -303,24 +331,32 @@ void SX_theoTenCasi(List &l)
 	}
 }
 
-void duaBaihatlenDau(List &l, Baihat x)
+int duaBaihatlenDau(List &l, Baihat x)
 {
-	if (strcmp(l.head->data.ten, x.ten) == 0)
-		return;
-	for (Node *k = l.head; k != NULL; k = k->next)
+	if (l.head == NULL)
+		return 0;
+
+	Node *k = l.head;
+	Node *h = k->next;
+	if (strcmp(x.ten, k->data.ten) == 0)
+		return 0;
+
+	while (h != NULL)
 	{
-		Node *h = k->next;
 		if (strcmp(x.ten, h->data.ten) == 0)
 		{
 			k->next = h->next;
-			if (h == l.tail)
-			{
-				l.tail = k;
-			}
 			h->next = l.head;
 			l.head = h;
+			if (h == l.tail)
+				l.tail = k;
+			return 1;
 		}
+		k = k->next;
+		if (k != NULL)
+			h = k->next;
 	}
+	return 0;
 }
 
 void MENU(List &l)
@@ -375,17 +411,24 @@ void MENU(List &l)
 		}
 		case 5:
 		{
-				  Baihat x;
-				  printf("\nNhap ten bai ban muon xoa: ");
-				  scanf("%s", x.ten);
-				  int ktra = xoaBaihat(l, x);
-				  if (ktra == 0)
-					  printf("\nThuc hien khong thanh cong!" 
-					  "\n(Co the trong ds khong co bai hat voi ten: %s)", x.ten);
-				  _getch();
-				  if (isEmpty(l) == 0)
-					  ghiFile(l);
-				  break;
+				Baihat x;
+				printf("\nNhap ten bai ban muon xoa: ");
+				scanf("%s", x.ten);
+				int ktra = xoaBaihat(l, x);
+				if (ktra == 0)
+				{
+					printf("\nThuc hien khong thanh cong!" 
+						"\n(Co the trong ds khong co bai hat voi ten: %s)", x.ten);
+					_getch();
+					return;
+				}
+				else
+				{
+					printf("\nThuc hien thanh cong!");
+					ghiFile(l);
+					_getch();
+				}
+				break;
 		}
 		case 6:
 		{
@@ -414,7 +457,12 @@ void MENU(List &l)
 				  Baihat x;
 				  printf("\nNhap ten bai ban muon dua len dau: ");
 				  scanf("%s", x.ten);
-				  duaBaihatlenDau(l, x);
+				  int ktra = duaBaihatlenDau(l, x);
+				  if (ktra == 1)
+				  	printf("\nThuc hien thanh cong!");
+				else
+					printf("\nKhong thuc hien thanh cong!");
+				_getch();
 				  break;
 		}
 		case 0:	return;
