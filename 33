@@ -1,0 +1,292 @@
+#include<stdio.h>
+#include<conio.h>
+#include<string.h>
+#include<stdlib.h>
+
+struct Baihat
+{
+	char ten[50];
+	char tacgia[40];
+	char casi[40];
+	int thoiluong;
+};
+
+struct Node
+{
+	Baihat data;
+	Node *next;
+};
+
+struct List
+{
+	Node *head;
+	Node *tail;
+};
+
+void initList(List &l)
+{
+	l.head = l.tail = NULL;
+}
+
+Node *createNode(Baihat x)
+{
+	Node *p = new Node;
+	p->data = x;
+	p->next = NULL;
+
+	return p;
+}
+
+int isEmpty(List l)
+{
+	if (l.head == NULL || l.tail == NULL)
+		return 1;
+	return 0;
+}
+
+void themvaoDau(List &l, Node *p)
+{
+	if (p == NULL)
+		printf("Khong thuc hien duoc");
+	else
+	{
+		if (l.head == NULL)
+		{
+			l.head = l.tail = p;
+		}
+		else
+		{
+			p->next = l.head;
+			l.head = p;
+		}
+	}
+}
+
+void themvaoCuoi(List &l, Node *p)
+{
+	if (p == NULL)
+		printf("Khong thuc hien duoc");
+	else
+	{
+		if (l.head == NULL)
+		{
+			l.head = l.tail = p;
+		}
+		else
+		{
+			l.tail->next = p;
+			l.tail = p;
+		}
+	}
+}
+
+void xoaDau(List& l)
+{
+	if (l.head == NULL) 
+		return;
+
+	Node* temp = l.head;
+	l.head = temp->next;
+	delete temp;
+
+	if (l.head == NULL) 
+		l.head = l.tail = NULL;
+}
+
+void xoaCuoi(List& l)
+{
+	if (l.tail == NULL) 
+		return;
+
+	Node* temp = l.head;
+
+	if (l.head->next == NULL){
+		delete temp;
+		l.head = l.tail = NULL;
+	}
+	else
+	{
+		while (temp->next != l.tail) 
+			temp = temp->next;
+
+		temp->next = NULL;
+		delete l.tail;
+		l.tail = temp;
+	}
+}
+
+void themvaoSau(List& l, Node* q, Node* p)
+{
+	if (q != NULL)
+	{
+		p->next = q->next;
+		q->next = p;
+		if (l.tail == q)
+			themvaoCuoi(l, p);
+	}
+	else
+		themvaoDau(l, p);
+}
+
+void xoaSau(List& l, Node* q)
+{
+	if (l.head == NULL) return;
+	if (q == NULL)
+		xoaDau(l);
+	else
+	{
+		Node* temp = q->next;
+		if (temp == l.tail)
+		{
+			xoaCuoi(l);
+		}
+		else
+		{
+			q->next = temp->next;
+			temp->next = NULL;
+			delete temp;
+		}
+	}
+}
+
+void ghiFile(List &l)
+{
+	FILE *f = fopen("Baihat.txt", "w");
+	if (f == NULL)
+	{
+		printf("\nKhong mo duoc File");
+		return;
+	}
+
+	for (Node *k = l.head; k != NULL; k = k->next)
+	{
+		fprintf(f, "%-20s %-20s %-20s %-10d\n", k->data.ten, k->data.tacgia, k->data.casi, k->data.thoiluong);
+	}
+	fclose(f);
+}
+
+
+void docFile(List &l)
+{
+	FILE* f = fopen("Baihat.txt", "r");
+	if (f == NULL)
+	{
+		printf("\nKhong mo duoc File");
+		return;
+	}
+
+	Baihat thongtin;
+	int ktra;
+	Node *tmp = l.head;
+	while ((ktra = fscanf(f, "%20s %20s %20s %10d", thongtin.ten, thongtin.tacgia, thongtin.casi, &thongtin.thoiluong)) == 4)
+	{
+		Node *p = createNode(thongtin);
+		int find = 0;
+		while (tmp != NULL)
+		{
+			if (strcmp(p->data.ten, tmp->data.ten) == 0)
+			{
+				find = 1;
+				free(p);
+				break;
+			}
+			tmp = tmp->next;
+		}
+		tmp = l.head;
+		if (find != 1)
+		{
+			themvaoCuoi(l, p);
+		}
+	}
+	fclose(f);
+}
+
+Baihat Nhap_Baihat()
+{
+	Baihat p;
+	printf("\nNhap vao ten bai hat: ");
+	scanf("%s", p.ten);
+	printf("\nNhap vao ten tac gia: ");
+	scanf("%s", p.tacgia);
+	printf("\nNhap vao ten ca si: ");
+	scanf("%s", p.casi);
+	printf("\nNhap vao thoi luong: ");
+	scanf("%d", &p.thoiluong);
+
+	return p;
+}
+
+void inBaihat(Node *p)
+{
+	printf("\nTen bai hat:  %s", p->data.ten);
+	printf("\nTen tac gia:  %s", p->data.tacgia);
+	printf("\nTen ca si:  %d", p->data.casi);
+	printf("\nThoi luong:  %d", p->data.thoiluong);
+}
+
+void inDSbaihat(List l)
+{
+	int i = 0;
+	for (Node *k = l.head; k != NULL; k = k->next)
+	{
+		printf("\n--- Bai hat thu %d --- ", (++i));
+		inBaihat(k);
+	}
+}
+
+void MENU(List &l)
+{
+	while (1 != 0)
+	{
+		system("cls");
+		printf("\n--------------------- MENU ---------------------");
+		printf("\n\t11. Doc danh sach tu File");
+		printf("\n\t12. Ghi danh sach vao File");
+		printf("\n\t2.  In danh sach bai bai");
+		printf("\n\t3.  Thoi luong xem het tat ca bai hat");
+		printf("\n\t4.  Them bai hat vao cuoi danh sach");
+		printf("\n\t0.  Thoat!");
+		printf("\n--------------------- END ---------------------");
+
+		int lc;
+		printf("\nNhap vao lua chon: ");
+		scanf_s("%d", &lc);
+
+		switch (lc)
+		{
+		case 11:
+		{
+				   docFile(l);
+				   break;
+		}
+		case 12:
+		{
+				   ghiFile(l);
+				   break;
+		}
+		case 2:
+		{
+				  inDSbaihat(l);
+				  _getch();
+				  break;
+		}
+		case 4:
+		{
+				  Baihat thongtin = Nhap_Baihat();
+				  Node *tmp = createNode(thongtin);
+				  themvaoCuoi(l, tmp);
+				  break;
+		}
+		case 0:	return;
+			break;
+		}
+	}
+}
+
+int main()
+{
+	List l;
+	initList(l);
+	MENU(l);
+	return 1;
+}
